@@ -1,41 +1,19 @@
 'use client';
 
-import { useState } from "react"
-import { useFormStatus } from "react-dom"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Loader2, Plus, Calendar, Flag } from "lucide-react"
-import { createTask } from "@/app/lib/task-actions"
-import { useActionState } from "react"
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Loader2, Plus, Calendar, Flag } from 'lucide-react';
+import { useCreateTask } from '../lib/hooks/useCreateTask';
 
-function SubmitButton() {
-  const { pending } = useFormStatus()
-
-  return (
-    <Button type="submit" disabled={pending} className="w-full sm:w-auto">
-      {pending ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Creating...
-        </>
-      ) : (
-        <>
-          <Plus className="mr-2 h-4 w-4" />
-          Create Task
-        </>
-      )}
-    </Button>
-  )
-}
-
-export default function TaskForm() {
-  const [state, formAction] = useActionState(createTask, null)
-  const [priority, setPriority] = useState("medium")
-  const [isExpanded, setIsExpanded] = useState(false)
+export default function TaskForm({ userId }: { userId: string }) {
+  const [ priority, setPriority ] = useState('medium');
+  const [ isExpanded, setIsExpanded ] = useState(false);
+  const { onSubmit, isPending } = useCreateTask(userId);
 
   return (
     <Card className="shadow-sm border-2 border-dashed border-muted-foreground/20 hover:border-primary/30 transition-colors">
@@ -49,19 +27,7 @@ export default function TaskForm() {
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        <form action={formAction} className="space-y-6">
-          {state?.error && (
-            <div className="bg-destructive/10 border border-destructive/50 text-destructive px-4 py-3 rounded-lg text-sm">
-              <strong>Error:</strong> {state.error}
-            </div>
-          )}
-
-          {state?.success && (
-            <div className="bg-green-500/10 border border-green-500/50 text-green-700 dark:text-green-300 px-4 py-3 rounded-lg text-sm">
-              <strong>Success:</strong> {state.success}
-            </div>
-          )}
-
+        <form onSubmit={onSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="title" className="text-sm font-medium flex items-center gap-2">
               Task Title <span className="text-destructive">*</span>
@@ -77,7 +43,7 @@ export default function TaskForm() {
               onClick={() => setIsExpanded(!isExpanded)}
               className="text-sm text-muted-foreground hover:text-foreground p-0 h-auto"
             >
-              {isExpanded ? "Hide" : "Show"} advanced options
+              {isExpanded ? 'Hide' : 'Show'} advanced options
             </Button>
 
             {isExpanded && (
@@ -86,13 +52,7 @@ export default function TaskForm() {
                   <Label htmlFor="description" className="text-sm font-medium">
                     Description
                   </Label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    placeholder="Add more details about this task..."
-                    rows={3}
-                    className="resize-none"
-                  />
+                  <Textarea id="description" name="description" placeholder="Add more details about this task..." rows={3} className="resize-none" />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -133,7 +93,13 @@ export default function TaskForm() {
                       <Calendar className="h-4 w-4" />
                       Due Date
                     </Label>
-                    <Input id="due_date" name="due_date" type="datetime-local" className="text-sm" />
+                    <Input
+                      id="due_date"
+                      name="due_date"
+                      type="datetime-local"
+                      className="text-sm"
+                      defaultValue={new Date().toISOString().slice(0, 16)}
+                    />
                   </div>
                 </div>
               </div>
@@ -141,10 +107,22 @@ export default function TaskForm() {
           </div>
 
           <div className="flex justify-end pt-4 border-t border-border">
-            <SubmitButton />
+            <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
+              {isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Task
+                </>
+              )}
+            </Button>
           </div>
         </form>
       </CardContent>
     </Card>
-  )
-} 
+  );
+}

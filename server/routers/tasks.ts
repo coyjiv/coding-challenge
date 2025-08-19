@@ -11,7 +11,7 @@ export const tasksRouter = router({
         .select('id, title, description, status, priority, due_date, created_at, updated_at, user_id')
         .eq('user_id', input.userId)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return data;
     }),
@@ -20,8 +20,8 @@ export const tasksRouter = router({
     .input(z.object({
       title: z.string().min(1),
       description: z.string().optional(),
-      status: z.enum(['pending', 'in-progress', 'completed']).default('pending'),
-      priority: z.enum(['low', 'medium', 'high']).default('medium'),
+      status: z.enum([ 'pending', 'in-progress', 'completed' ]).default('pending'),
+      priority: z.enum([ 'low', 'medium', 'high' ]).default('medium'),
       due_date: z.string().optional(), // ISO string
       userId: z.string(),
     }))
@@ -38,7 +38,7 @@ export const tasksRouter = router({
         })
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     }),
@@ -48,8 +48,8 @@ export const tasksRouter = router({
       id: z.string(),
       title: z.string().min(1),
       description: z.string().optional(),
-      status: z.enum(['pending', 'in-progress', 'completed']),
-      priority: z.enum(['low', 'medium', 'high']),
+      status: z.enum([ 'pending', 'in-progress', 'completed' ]),
+      priority: z.enum([ 'low', 'medium', 'high' ]),
       due_date: z.string().optional(),
       userId: z.string(),
     }))
@@ -68,7 +68,7 @@ export const tasksRouter = router({
         .eq('user_id', input.userId)
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     }),
@@ -84,38 +84,82 @@ export const tasksRouter = router({
         .delete()
         .eq('id', input.id)
         .eq('user_id', input.userId);
-      
+
       if (error) throw error;
       return { success: true };
     }),
 
-  toggleStatus: publicProcedure
-    .input(z.object({
-      id: z.string(),
-      currentStatus: z.string(),
-      userId: z.string(),
-    }))
+  changeToPrevStatus: publicProcedure
+    .input(z.object({ id: z.string(), userId: z.string() }))
     .mutation(async ({ input }) => {
-      const statusMap = {
-        'pending': 'in-progress',
-        'in-progress': 'completed',
-        'completed': 'pending'
-      };
-      
-      const newStatus = statusMap[input.currentStatus as keyof typeof statusMap] || 'pending';
-      
-      const { data, error } = await supabaseAdmin
+      const { data: current, error: e1 } = await supabaseAdmin
         .from('tasks')
-        .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString()
-        })
+        .select('status')
         .eq('id', input.id)
         .eq('user_id', input.userId)
+        .maybeSingle()
+      if (e1) throw e1
+      if (!current) throw new Error('Task not found')
+
+      const prevMap = { pending: null, 'in-progress': 'pending', completed: 'in-progress' } as const
+      const newStatus = prevMap[ current.status as 'pending' | 'in-progress' | 'completed' ]
+      if (newStatus === null) {
+        const { data, error } = await supabaseAdmin
+          .from('tasks')
+          .select()
+          .eq('id', input.id)
+          .eq('user_id', input.userId)
+          .single()
+        if (error) throw error
+        return data
+      }
+
+      const { data, error } = await supabaseAdmin
+        .from('tasks')
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
+        .eq('id', input.id)
+        .eq('user_id', input.userId)
+        .eq('status', current.status)
         .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
+        .single()
+      if (error) throw error
+      return data
+    }),
+
+  changeToNextStatus: publicProcedure
+    .input(z.object({ id: z.string(), userId: z.string() }))
+    .mutation(async ({ input }) => {
+      const { data: current, error: e1 } = await supabaseAdmin
+        .from('tasks')
+        .select('status')
+        .eq('id', input.id)
+        .eq('user_id', input.userId)
+        .maybeSingle()
+      if (e1) throw e1
+      if (!current) throw new Error('Task not found')
+
+      const nextMap = { pending: 'in-progress', 'in-progress': 'completed', completed: null } as const
+      const newStatus = nextMap[ current.status as 'pending' | 'in-progress' | 'completed' ]
+      if (newStatus === null) {
+        const { data, error } = await supabaseAdmin
+          .from('tasks')
+          .select()
+          .eq('id', input.id)
+          .eq('user_id', input.userId)
+          .single()
+        if (error) throw error
+        return data
+      }
+
+      const { data, error } = await supabaseAdmin
+        .from('tasks')
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
+        .eq('id', input.id)
+        .eq('user_id', input.userId)
+        .eq('status', current.status)
+        .select()
+        .single()
+      if (error) throw error
+      return data
     }),
 }); 

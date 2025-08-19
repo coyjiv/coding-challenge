@@ -78,25 +78,31 @@ export async function deleteTask(taskId: string) {
   }
 }
 
-export async function toggleTaskStatus(taskId: string, currentStatus: string) {
+export async function moveTaskStatusForward(taskId: string) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { error: 'User not authenticated' };
-    }
+    const session = await auth()
+    if (!session?.user?.id) return { error: 'User not authenticated' }
 
-    const trpcServer = await createAuthenticatedTRPCServerClient();
-    
-    await trpcServer.tasks.toggleStatus({
-      id: taskId,
-      currentStatus,
-      userId: session.user.id,
-    });
-
-    return { success: 'Task status updated successfully' };
+    const trpcServer = await createAuthenticatedTRPCServerClient()
+    await trpcServer.tasks.changeToNextStatus({ id: taskId, userId: session.user.id })
+    return { success: 'Task status updated successfully' }
   } catch (error) {
-    console.error('Error updating task status:', error);
-    return { error: 'Failed to update task status' };
+    console.error('Error updating task status:', error)
+    return { error: 'Failed to update task status' }
+  }
+}
+
+export async function moveTaskStatusBackward(taskId: string) {
+  try {
+    const session = await auth()
+    if (!session?.user?.id) return { error: 'User not authenticated' }
+
+    const trpcServer = await createAuthenticatedTRPCServerClient()
+    await trpcServer.tasks.changeToPrevStatus({ id: taskId, userId: session.user.id })
+    return { success: 'Task status updated successfully' }
+  } catch (error) {
+    console.error('Error updating task status:', error)
+    return { error: 'Failed to update task status' }
   }
 }
 

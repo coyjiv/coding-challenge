@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useEffect } from "react"
 import { useFormStatus } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Loader2, CheckSquare, Mail, Lock, UserPlus } from "lucide-react"
 import Link from "next/link"
 import { signUp } from "@/app/lib/actions"
+import { useRouter } from "next/navigation"
 
 function SubmitButton() {
   const { pending } = useFormStatus()
@@ -36,6 +37,21 @@ export default function SignUpForm() {
     error: undefined, 
     message: undefined 
   });
+
+  console.log("SignUpForm state:", state);
+  
+
+  const router = useRouter();
+
+  useEffect(()=> {
+    if(state.success){
+      const timeout = setTimeout(() => {
+        router.push('/login');
+      }, 1000)
+
+      return () => clearTimeout(timeout);      
+    }
+  }, [state]);
 
   return (
     <div className="w-full max-w-md mx-auto">

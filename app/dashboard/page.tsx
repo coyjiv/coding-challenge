@@ -32,7 +32,7 @@ export default async function Dashboard() {
                 <form
                   action={async () => {
                     'use server';
-                    await signOut();
+                    await signOut({ redirectTo: '/login'});
                   }}
                 >
                   <Button className="flex items-center gap-2 cursor-pointer">
@@ -44,7 +44,7 @@ export default async function Dashboard() {
           </div>
           
           <div className="space-y-8">
-            <TaskForm />
+            <TaskForm userId={session.user.id} />
             <TaskList userId={session.user.id} />
           </div>
         </div>
