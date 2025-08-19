@@ -1,10 +1,8 @@
 import LoginForm from "@/components/auth/login-form"
 
-type Props = {}
-
-const LoginPage = (props: Props) => {
+const LoginPage = () => {
   return (
-    <LoginForm/>
+    <div className="flex justify-center items-center h-full"><LoginForm/></div>
   )
 }
 

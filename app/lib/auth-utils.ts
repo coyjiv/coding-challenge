@@ -7,6 +7,42 @@ export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, saltRounds)
 }
 
+export async function getUserByEmail(email: string): Promise<User | null> {
+  try {
+    console.log('Looking for user with email:', email)
+    
+    const { data, error } = await supabaseAdmin
+      .from("users")
+      .select("id,name,email,password,role")
+      .eq("email", email)
+      .maybeSingle()
+    
+    if (error) {
+      console.error("Supabase error:", error)
+      return null
+    }
+    
+    if (!data) {
+      console.log("No user found with email:", email)
+      return null
+    }
+    
+    console.log("User found:", { 
+      id: data.id, 
+      email: data.email, 
+      name: data.name, 
+      role: data.role,
+      hasPassword: !!data.password,
+      passwordLength: data.password?.length
+    })
+    
+    return data as User
+  } catch (error) {
+    console.error("Error fetching user:", error)
+    return null
+  }
+}
+
 export async function createUser(userData: {
   name: string
   email: string
@@ -28,14 +64,12 @@ export async function createUser(userData: {
       .single()
     
     if (error) {
-      console.error('Error creating user:', error)
-      return null
+      throw error;
     }
     
     return data as User
   } catch (error) {
-    console.error('Error in createUser:', error)
-    return null
+    throw error;
   }
 }
 
@@ -68,7 +102,6 @@ export async function getUserById(userId: string): Promise<User | null> {
     const { data, error } = await supabaseAdmin
       .from('users')
       .select('id,name,email,password,role')
-      .eq('id', userId)
       .single()
     
     if (error) {

@@ -3,55 +3,12 @@ import Credentials from "next-auth/providers/credentials"
 import { authConfig } from "./auth.config"
 import { z } from "zod"
 import bcrypt from "bcrypt"
-import { createClient } from "@supabase/supabase-js"
-import { User } from "./app/lib/definitions"
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false, autoRefreshToken: false } }
-)
+import { getUserByEmail } from "@/app/lib/auth-utils"
 
 const CredentialsSchema = z.object({
   email: z.email(),
   password: z.string().min(6),
 })
-
-async function getUser(email: string): Promise<User | null> {
-  try {
-    console.log('🔍 Looking for user with email:', email)
-    
-    const { data, error } = await supabase
-      .from("users")
-      .select("id,name,email,password,role")
-      .eq("email", email)
-      .maybeSingle()
-    
-    if (error) {
-      console.error("Supabase error:", error)
-      return null
-    }
-    
-    if (!data) {
-      console.log("No user found with email:", email)
-      return null
-    }
-    
-    console.log("User found:", { 
-      id: data.id, 
-      email: data.email, 
-      name: data.name, 
-      role: data.role,
-      hasPassword: !!data.password,
-      passwordLength: data.password?.length
-    })
-    
-    return data as User
-  } catch (error) {
-    console.error("Error fetching user:", error)
-    return null
-  }
-}
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
   ...authConfig,
@@ -73,10 +30,10 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           const { email, password } = parsed.data
           console.log(' Parsed credentials - email:', email)
           
-          const user = await getUser(email)
+          const user = await getUserByEmail(email)
           
           if (!user) {
-            console.log("getUser returned null")
+            console.log("getUserByEmail returned null")
             return null
           }
           
