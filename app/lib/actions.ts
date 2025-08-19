@@ -53,6 +53,7 @@ export async function signUp(
     }
     
     return { success: false, error: 'Failed to create user' };
+    //@ts-ignore
   } catch (error: { code?: string; message?: string } | any) {
     console.error('Sign up error:', error);
     

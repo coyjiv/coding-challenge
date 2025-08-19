@@ -44,7 +44,7 @@ export default async function Dashboard() {
           </div>
           
           <div className="space-y-8">
-            <TaskForm userId={session.user.id} />
+            <TaskForm />
             <TaskList userId={session.user.id} />
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 
-export async function createContext(opts: { headers?: Headers; info?: any }) {
+export async function createContext(opts: { headers?: Headers; info?: unknown }) {
   const session = await auth();
   
   return {
