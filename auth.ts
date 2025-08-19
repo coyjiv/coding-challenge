@@ -16,11 +16,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     Credentials({
       authorize: async (credentials) => {
         try {
-          console.log('Starting authorization for credentials:', { 
-            email: credentials?.email,
-            hasPassword: !!credentials?.password 
-          })
-          
           const parsed = CredentialsSchema.safeParse(credentials)
           if (!parsed.success) {
             console.error("Validation error:", parsed.error)
@@ -28,8 +23,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           }
           
           const { email, password } = parsed.data
-          console.log(' Parsed credentials - email:', email)
-          
           const user = await getUserByEmail(email)
           
           if (!user) {
@@ -37,10 +30,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             return null
           }
           
-          console.log('Comparing passwords...')
           const passwordMatch = await bcrypt.compare(password, user.password)
-          console.log('Password match result:', passwordMatch)
-          
           if (!passwordMatch) {
             console.log("Password mismatch for user:", email)
             return null
@@ -60,4 +50,24 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      console.log('JWT callback - user:', user, 'token:', token);
+      if (user) {
+        token.role = user.role
+        token.id = user.id
+        console.log('JWT callback - updated token:', token);
+      }
+      return token
+    },
+    async session({ session, token }) {
+      console.log('Session callback - token:', token, 'session:', session);
+      if (token) {
+        session.user.id = token.sub as string
+        session.user.role = token.role as string
+        console.log('Session callback - updated session:', session);
+      }
+      return session
+    },
+  },
 })

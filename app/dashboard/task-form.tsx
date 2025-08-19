@@ -1,0 +1,156 @@
+'use client';
+
+import { useState } from "react"
+import { useFormStatus } from "react-dom"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { Loader2, Plus, X, Calendar, Flag } from "lucide-react"
+import { createTask } from "@/app/lib/task-actions"
+import { useActionState } from "react"
+
+function SubmitButton() {
+  const { pending } = useFormStatus()
+
+  return (
+    <Button type="submit" disabled={pending} className="w-full sm:w-auto">
+      {pending ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Creating...
+        </>
+      ) : (
+        <>
+          <Plus className="mr-2 h-4 w-4" />
+          Create Task
+        </>
+      )}
+    </Button>
+  )
+}
+
+export default function TaskForm({ userId }: { userId: string }) {
+  const [state, formAction] = useActionState(createTask, null)
+  const [priority, setPriority] = useState("medium")
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  return (
+    <Card className="shadow-sm border-2 border-dashed border-muted-foreground/20 hover:border-primary/30 transition-colors">
+      <CardHeader className="pb-4">
+        <div className="space-y-1">
+          <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+            <Plus className="h-5 w-5 text-primary" />
+            Create New Task
+          </CardTitle>
+          <CardDescription className="text-sm">Add a new task to stay organized and productive</CardDescription>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <form action={formAction} className="space-y-6">
+          {/* Status Messages */}
+          {state?.error && (
+            <div className="bg-destructive/10 border border-destructive/50 text-destructive px-4 py-3 rounded-lg text-sm">
+              <strong>Error:</strong> {state.error}
+            </div>
+          )}
+
+          {state?.success && (
+            <div className="bg-green-500/10 border border-green-500/50 text-green-700 dark:text-green-300 px-4 py-3 rounded-lg text-sm">
+              <strong>Success:</strong> {state.success}
+            </div>
+          )}
+
+          {/* Title Field */}
+          <div className="space-y-2">
+            <Label htmlFor="title" className="text-sm font-medium flex items-center gap-2">
+              Task Title <span className="text-destructive">*</span>
+            </Label>
+            <Input id="title" name="title" placeholder="What needs to be done?" required className="text-base" />
+          </div>
+
+          {/* Expandable Advanced Fields */}
+          <div className="space-y-4">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-sm text-muted-foreground hover:text-foreground p-0 h-auto"
+            >
+              {isExpanded ? "Hide" : "Show"} advanced options
+            </Button>
+
+            {isExpanded && (
+              <div className="space-y-4 pt-2 border-t border-border">
+                {/* Description Field */}
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-sm font-medium">
+                    Description
+                  </Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    placeholder="Add more details about this task..."
+                    rows={3}
+                    className="resize-none"
+                  />
+                </div>
+
+                {/* Priority and Due Date Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="priority" className="text-sm font-medium flex items-center gap-2">
+                      <Flag className="h-4 w-4" />
+                      Priority
+                    </Label>
+                    <Select name="priority" value={priority} onValueChange={setPriority}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                            Low Priority
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="medium">
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
+                            Medium Priority
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="high">
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-red-500"></div>
+                            High Priority
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="due_date" className="text-sm font-medium flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Due Date
+                    </Label>
+                    <Input id="due_date" name="due_date" type="datetime-local" className="text-sm" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-end pt-4 border-t border-border">
+            <SubmitButton />
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  )
+} 

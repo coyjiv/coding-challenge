@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+###### Task Tracker - Task Management App
+#### A full-stack task management application built with Next.js, NextAuth, Supabase, and tRPC.
 
-## Getting Started
+### 🚀 Features
 
-First, run the development server:
+Authentication: NextAuth.js with email/password login
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Task Management: Full CRUD operations for tasks
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Database: Supabase with PostgreSQL
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+API: tRPC for type-safe communication
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+UI: Radix UI components with Tailwind CSS
 
-## Learn More
+### 🛠️ Tech Stack
+Frontend: Next.js 15, React 19, TypeScript
+Backend: NextAuth.js v5, tRPC, Supabase
+Database: PostgreSQL
+Styling: Tailwind CSS, Radix UI components
 
-To learn more about Next.js, take a look at the following resources:
+### 📁 Project Structure
+├── app/
+│   ├── dashboard/          # Protected dashboard (CSR)*
+│   ├── faq/               # FAQ page (SSG)
+│   ├── terms/             # Terms of Service (SSR)
+│   └── auth/              # Login/signup pages
+├── components/ui/          # Radix UI components
+├── lib/                    # Utilities and actions
+└── server/                 # tRPC server setup
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Getting Started
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Install dependencies: npm install
 
-## Deploy on Vercel
+Set up Supabase environment variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Run database schema
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Start dev server: npm run dev
+
+### 🔐 Authentication
+
+NextAuth.js with Credentials Provider
+Protected dashboard routes
+User data isolation
+
+### 📱 Rendering Strategies
+
+Task List: Client-Side Rendering (CSR)
+
+FAQ: Static Site Generation (SSG)
+
+Terms: Server-Side Rendering (SSR)
+
+Ready for deployment on Vercel or any Node.js platform.
