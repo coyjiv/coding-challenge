@@ -26,17 +26,14 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           const user = await getUserByEmail(email)
           
           if (!user) {
-            console.log("getUserByEmail returned null")
             return null
           }
           
           const passwordMatch = await bcrypt.compare(password, user.password)
           if (!passwordMatch) {
-            console.log("Password mismatch for user:", email)
             return null
           }
           
-          console.log('Authentication successful for user:', email)
           return {
             id: user.id,
             name: user.name,
@@ -44,7 +41,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             role: user.role ?? "user"
           }
         } catch (error) {
-          console.error("Authorization error:", error)
           return null
         }
       },
@@ -52,20 +48,16 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user }) {
-      console.log('JWT callback - user:', user, 'token:', token);
       if (user) {
         token.role = user.role
         token.id = user.id
-        console.log('JWT callback - updated token:', token);
       }
       return token
     },
     async session({ session, token }) {
-      console.log('Session callback - token:', token, 'session:', session);
       if (token) {
         session.user.id = token.sub as string
         session.user.role = token.role as string
-        console.log('Session callback - updated session:', session);
       }
       return session
     },

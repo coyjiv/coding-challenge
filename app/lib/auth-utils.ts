@@ -9,8 +9,6 @@ export async function hashPassword(password: string): Promise<string> {
 
 export async function getUserByEmail(email: string): Promise<User | null> {
   try {
-    console.log('Looking for user with email:', email)
-    
     const { data, error } = await supabaseAdmin
       .from("users")
       .select("id,name,email,password,role")
@@ -23,7 +21,6 @@ export async function getUserByEmail(email: string): Promise<User | null> {
     }
     
     if (!data) {
-      console.log("No user found with email:", email)
       return null
     }
     
@@ -96,22 +93,3 @@ export async function updateUserPassword(
     return false
   }
 }
-
-export async function getUserById(userId: string): Promise<User | null> {
-  try {
-    const { data, error } = await supabaseAdmin
-      .from('users')
-      .select('id,name,email,password,role')
-      .single()
-    
-    if (error) {
-      console.error('Error fetching user by ID:', error)
-      return null
-    }
-    
-    return data as User
-  } catch (error) {
-    console.error('Error in getUserById:', error)
-    return null
-  }
-} 

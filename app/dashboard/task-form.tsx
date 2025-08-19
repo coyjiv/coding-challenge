@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Loader2, Plus, X, Calendar, Flag } from "lucide-react"
+import { Loader2, Plus, Calendar, Flag } from "lucide-react"
 import { createTask } from "@/app/lib/task-actions"
 import { useActionState } from "react"
 
@@ -32,7 +32,7 @@ function SubmitButton() {
   )
 }
 
-export default function TaskForm({ userId }: { userId: string }) {
+export default function TaskForm() {
   const [state, formAction] = useActionState(createTask, null)
   const [priority, setPriority] = useState("medium")
   const [isExpanded, setIsExpanded] = useState(false)
@@ -50,7 +50,6 @@ export default function TaskForm({ userId }: { userId: string }) {
       </CardHeader>
       <CardContent className="space-y-6">
         <form action={formAction} className="space-y-6">
-          {/* Status Messages */}
           {state?.error && (
             <div className="bg-destructive/10 border border-destructive/50 text-destructive px-4 py-3 rounded-lg text-sm">
               <strong>Error:</strong> {state.error}
@@ -63,7 +62,6 @@ export default function TaskForm({ userId }: { userId: string }) {
             </div>
           )}
 
-          {/* Title Field */}
           <div className="space-y-2">
             <Label htmlFor="title" className="text-sm font-medium flex items-center gap-2">
               Task Title <span className="text-destructive">*</span>
@@ -71,7 +69,6 @@ export default function TaskForm({ userId }: { userId: string }) {
             <Input id="title" name="title" placeholder="What needs to be done?" required className="text-base" />
           </div>
 
-          {/* Expandable Advanced Fields */}
           <div className="space-y-4">
             <Button
               type="button"
@@ -85,7 +82,6 @@ export default function TaskForm({ userId }: { userId: string }) {
 
             {isExpanded && (
               <div className="space-y-4 pt-2 border-t border-border">
-                {/* Description Field */}
                 <div className="space-y-2">
                   <Label htmlFor="description" className="text-sm font-medium">
                     Description
@@ -99,7 +95,6 @@ export default function TaskForm({ userId }: { userId: string }) {
                   />
                 </div>
 
-                {/* Priority and Due Date Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="priority" className="text-sm font-medium flex items-center gap-2">
@@ -145,7 +140,6 @@ export default function TaskForm({ userId }: { userId: string }) {
             )}
           </div>
 
-          {/* Submit Button */}
           <div className="flex justify-end pt-4 border-t border-border">
             <SubmitButton />
           </div>

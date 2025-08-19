@@ -53,7 +53,7 @@ export async function signUp(
     }
     
     return { success: false, error: 'Failed to create user' };
-  } catch (error: any) {
+  } catch (error: { code?: string; message?: string } | any) {
     console.error('Sign up error:', error);
     
     if (error?.code === '23505') {
