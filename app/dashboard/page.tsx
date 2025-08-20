@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import TaskForm from './task-form';
 import TaskList from './task-list';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default async function Dashboard() {
   const session = await auth();
@@ -14,7 +15,7 @@ export default async function Dashboard() {
   }
 
   return (
-    <>
+    <Suspense fallback={'loading...'}>
         <div className="max-w-6xl mx-auto p-6">
           <div className="flex justify-between items-center mb-8">
             <div>
@@ -49,6 +50,6 @@ export default async function Dashboard() {
           </div>
         </div>
        
-    </>
+    </Suspense>
   );
 }

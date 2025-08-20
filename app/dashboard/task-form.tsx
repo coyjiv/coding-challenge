@@ -9,8 +9,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Loader2, Plus, Calendar, Flag } from 'lucide-react';
 import { useCreateTask } from '../lib/hooks/useCreateTask';
+import { DatePicker } from '@/components/ui/datepicker'
+
 
 export default function TaskForm({ userId }: { userId: string }) {
+  const [ dueDate, setDueDate ] = useState<Date | undefined>(undefined);
   const [ priority, setPriority ] = useState('medium');
   const [ isExpanded, setIsExpanded ] = useState(false);
   const { onSubmit, isPending } = useCreateTask(userId);
@@ -37,11 +40,11 @@ export default function TaskForm({ userId }: { userId: string }) {
 
           <div className="space-y-4">
             <Button
-              type="button"
-              variant="ghost"
+              // type="button"
+              variant="secondary"
               size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-sm text-muted-foreground hover:text-foreground p-0 h-auto"
+              // className="text-sm text-muted-foreground hover:text-foreground p-0 h-auto"
             >
               {isExpanded ? 'Hide' : 'Show'} advanced options
             </Button>
@@ -93,13 +96,8 @@ export default function TaskForm({ userId }: { userId: string }) {
                       <Calendar className="h-4 w-4" />
                       Due Date
                     </Label>
-                    <Input
-                      id="due_date"
-                      name="due_date"
-                      type="datetime-local"
-                      className="text-sm"
-                      defaultValue={new Date().toISOString().slice(0, 16)}
-                    />
+                    <DatePicker date={dueDate} setDate={setDueDate} />
+                    <input type="hidden" id="due_date" name="due_date" value={dueDate ? dueDate.toISOString() : ''} />
                   </div>
                 </div>
               </div>
@@ -107,7 +105,7 @@ export default function TaskForm({ userId }: { userId: string }) {
           </div>
 
           <div className="flex justify-end pt-4 border-t border-border">
-            <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
+            <Button variant={'outline'} type="submit" disabled={isPending} className="w-full sm:w-auto">
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
