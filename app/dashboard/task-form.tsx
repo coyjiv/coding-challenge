@@ -18,6 +18,13 @@ export default function TaskForm({ userId }: { userId: string }) {
   const [ isExpanded, setIsExpanded ] = useState(false);
   const { onSubmit, isPending } = useCreateTask(userId);
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    onSubmit(event); 
+    setDueDate(undefined); 
+    if(isExpanded){
+      setIsExpanded(false)
+    }
+  }
   return (
     <Card className="shadow-sm border-2 border-dashed border-muted-foreground/20 hover:border-primary/30 transition-colors">
       <CardHeader className="pb-4">
@@ -30,7 +37,7 @@ export default function TaskForm({ userId }: { userId: string }) {
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        <form onSubmit={onSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="title" className="text-sm font-medium flex items-center gap-2">
               Task Title <span className="text-destructive">*</span>
@@ -40,11 +47,10 @@ export default function TaskForm({ userId }: { userId: string }) {
 
           <div className="space-y-4">
             <Button
-              // type="button"
+              type="button"
               variant="secondary"
               size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
-              // className="text-sm text-muted-foreground hover:text-foreground p-0 h-auto"
             >
               {isExpanded ? 'Hide' : 'Show'} advanced options
             </Button>
