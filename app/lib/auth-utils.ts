@@ -24,15 +24,6 @@ export async function getUserByEmail(email: string): Promise<User | null> {
       return null
     }
     
-    console.log("User found:", { 
-      id: data.id, 
-      email: data.email, 
-      name: data.name, 
-      role: data.role,
-      hasPassword: !!data.password,
-      passwordLength: data.password?.length
-    })
-    
     return data as User
   } catch (error) {
     console.error("Error fetching user:", error)

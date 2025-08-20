@@ -37,8 +37,6 @@ export default function SignUpForm() {
     error: undefined, 
     message: undefined 
   });
-
-  console.log("SignUpForm state:", state);
   
 
   const router = useRouter();
